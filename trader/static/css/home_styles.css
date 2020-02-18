@@ -1,0 +1,22 @@
+.page_title{
+    color: rgb(212, 212, 212);
+    text-align: center; 
+}
+.text_desc{
+    color:rgb(212, 212, 212);
+    font-size: 15px;
+}
+.first-section{
+    background-color: #1d1e22;
+}
+.button-get {
+    width: 200px;
+    margin: 10px auto 10px auto
+}
+.chart_centered {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    height: 40vh;
+    width: 80vw;
+}

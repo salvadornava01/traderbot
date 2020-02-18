@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+        <!-- {% include "navbar.html" %} -->
+        <div class="first-section">
+            <div class="container">
+                <h1 class='page_title'> Welcome to TraderBot</h1>
+                <div style="text-align: center; margin: 10px 0 10px 0">
+                    <img src="/static/images/bot_img.svg" alt="" width="100px" class="img-fluid">
+                </div>
+                <div class="">
+                    <p class="text_desc">
+                        In this project, you will find the implementation of 2 different Machine Learning techniques 
+                        for predicting a stock value and simulate trading operations.
+                        Both implementations are made using <a href="https://www.alphavantage.co/">Alpha Vantage</a>'s API for getting the stock prices
+                        and  <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a>, an open source Machine Learning tool for predictive data analysis. 
+                    </p>
+                    <p class="text_desc">
+                        The first implementation is a Supervised Learning technique called Decision Tree. 
+                        The predicted prices for the stock (FUTURE PRICES) are estimated 5 time intervals in the future from the actual price.
+                        The features used to train the decision tree regressor are:
+                        <ul class="text_desc">
+                            <li>Future Price (5 periods in the future)</li>
+                            <li>Actual Price</li>
+                            <li>Actual MACD Value</li>
+                            <li>Actual MACD Signal</li>
+                            <li>Actual MACD Histogram</li>
+                            <li>Actual RSI Value</li>
+                        </ul>   
+                    </p>
+                    <h3 class="page_title"> Training the Model</h3>
+                    <div style="text-align: center; margin: 10px 0 10px 0">
+                        <img src="/static/images/brainchip.svg" alt="" width="100px" class="img-fluid">
+                    </div>
+                    <p class="text_desc"> 
+                        In the section below are one text input for the stock symbol and 3 charts, one for the stock prices, another for MACD Study Data and the last 
+                        for the RSI Study Data. 
+                    </p>
+                    <p class="text_desc"> 
+                        Please follow this steps:
+                        <ol class="text_desc">
+                            <li>Type a valid stock symbol (SPY, AAPL, MSFT...)</li>
+                            <li>Press Get Price Data</li>
+                            <li>Press Get MACD Data</li>
+                            <li>Press Get RSI Data</li>
+                        </ol> 
+                    </p>
+                </div>
+                <div class="row">
+                    <!-- <form action="" method="POST">{% csrf_token %} -->
+                        <input class="form-control" type="text" id="stock_symbol" value="spy" name="prueba" placeholder="Symbol" >
+                        <button type="submit" class="btn btn-success btn-lg btn-block button-get" id="stock_submit" >Get Price Data</button>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block button-get" id="bollinger_data" >Get Bollinger Data</button>
+                        <button class="btn btn-light btn-lg btn-block button-get" id="clear">CLEAR</button>
+                    <!-- </form> -->
+                </div>
+                <div class="row">
+                    <div class="chart-container chart_centered" style="position: relative; height:40vh; width:80vw">
+                        <canvas id="chart" >
+                        </canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-success btn-lg btn-block button-get" id="get_macd_data" >Get MACD Data</button>
+                </div>
+                <div class="row">
+                    <div class="chart-container chart_centered" style="position: relative; height:40vh; width:80vw">
+                        <canvas id="macd_chart" ></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-success btn-lg btn-block button-get button-get" id="get_rsi_data" >Get RSI Data</button>
+                </div>
+                <div class="row">
+                    <div class="chart-container chart_centered" style="position: relative; height:40vh; width:80vw">
+                        <canvas id="rsi_chart"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-success btn-lg btn-block button-get" id="train-test" >Train Test</button>
+                </div>
+            </div>
+        </div>
+        <div class="first-section" style="padding-top: 50px;">
+            <div class="container">
+                <h3 class="page_title"> Predicting Prices</h3>
+                <div style="text-align: center; margin: 10px 0 10px 0">
+                    <img src="/static/images/predictions.svg" alt="" width="100px" class="img-fluid">
+                    <p class="text_desc">
+                        Now that you have the Stock Data and the Decision Tree Model trained its time to
+                        make some predictions over new data!   
+                    </p>
+                </div>
+                <div class="chart-container chart_centered" style="position: relative; height: 68vh; width:80vw">
+                    <canvas id="newdata_chart"></canvas>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-success btn-lg btn-block button-get" id="make-predict" >Predict Prices</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/scripts/home.js"></script>
+        <script src="/static/scripts/csv_down.js"></script>
+
+{% endblock %}
