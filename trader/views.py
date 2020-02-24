@@ -21,98 +21,104 @@ def home_view(request, *args, **kwargs):
         print(share_data['2019-09-12'])        
 
     if request.is_ajax():
+        try:
+            # If user request Stock Prices 
+            if 'stock' in request.GET:
+                share_symbol = request.GET['stock'].upper()
+                print(share_symbol)   
+                share_data, meta = ts.get_intraday(symbol=share_symbol, interval='5min', outputsize='full')
+                fechas = []
+                cierres = []
+                # import pdb
+                # pdb.set_trace()
+                for i in share_data.keys(): 
+                    fechas.append(i)
+                    cierres.append(share_data[i]['4. close'])
+                fechas = fechas[0:1000]
+                cierres = cierres[0:1000]
+                fechas.reverse()
+                cierres.reverse()
+                request.session['fechas_data'] = fechas[:-5]
+                request.session['stock_prices'] = cierres[:-5]
+                request.session['future_prices'] = cierres[5:]
+                data = [share_symbol,fechas,cierres]
+                data_json = json.dumps(data)
+                return HttpResponse(data_json, content_type='application/json')
 
-        # If user request Stock Prices 
-        if 'stock' in request.GET:
-            share_symbol = request.GET['stock'].upper()
-            print(share_symbol)   
-            share_data, meta = ts.get_intraday(symbol=share_symbol, interval='5min', outputsize='full')
-            fechas = []
-            cierres = []
+            # Else if user request Bollinger Data
+            elif 'bollinger_data' in request.GET:
+                share_symbol = request.GET['bollinger_data'].upper()
+                bbands_data, bbands_meta = tech_ind.get_bbands(symbol=share_symbol, interval='5min')
+                bbands_values = [[],[],[]]
+                for i in bbands_data.keys():
+                    bbands_values[0].append(bbands_data[i]['Real Middle Band'])
+                    bbands_values[1].append(bbands_data[i]['Real Upper Band'])
+                    bbands_values[2].append(bbands_data[i]['Real Lower Band'])
+                anly100_middle = bbands_values[0][:77]
+                anly100_upper = bbands_values[1][:77]
+                anly100_lower = bbands_values[2][:77]
+                anly100_middle.reverse()
+                anly100_upper.reverse()
+                anly100_lower.reverse()
+                print(share_symbol)
+
+                data = [anly100_middle, anly100_upper, anly100_lower]
+                data_json = json.dumps(data)
+
+                return HttpResponse(data_json, content_type='application/json')
+
+            # Else if user request RSI Data
+            elif 'get_rsi_data' in request.GET:
+                share_symbol = request.GET['get_rsi_data'].upper()
+                rsi_data, rsi_meta = tech_ind.get_rsi(symbol=share_symbol, interval='5min', time_period=14, series_type = 'close')
+                rsi_values = []
+                fechas = []
+                for i in rsi_data.keys():
+                    fechas.append(i)
+                    rsi_values.append(rsi_data[i]['RSI'])
+                # fechas.reverse()
+                # rsi_values.reverse()
+                fechas = fechas[:1000]
+                rsivalues = rsi_values[:1000]
+                fechas.reverse()
+                rsivalues.reverse()
+                request.session['rsi_values'] = rsivalues[:-5]
+                data = [share_symbol, fechas, rsivalues]
+                data_json = json.dumps(data)
+                return HttpResponse(data_json, content_type='application/json')
+
+
+            # Else if user request MACD Data
+            elif 'get_macd_data' in request.GET:
+                share_symbol = request.GET['get_macd_data'].upper()
+                macd_data, macd_meta = tech_ind.get_macd(symbol=share_symbol, interval='5min', series_type='close', fastperiod=12, slowperiod=26, signalperiod=9)
+                # import pdb
+                # pdb.set_trace()
+                fechas = []
+                macd_values = [[],[],[]]
+                for i in macd_data.keys():
+                    fechas.append(i)
+                    macd_values[0].append(macd_data[i]['MACD'])
+                    macd_values[1].append(macd_data[i]['MACD_Hist'])
+                    macd_values[2].append(macd_data[i]['MACD_Signal'])
+                fechas = fechas[:1000]
+                macd = macd_values[0][:1000]
+                macd_hist = macd_values[1][:1000]
+                macd_sign = macd_values[2][:1000]
+                fechas.reverse()
+                macd.reverse()
+                macd_hist.reverse()
+                macd_sign.reverse()
+                request.session['macd_data'] = [macd[:-5], macd_hist[:-5], macd_sign[:-5]]
+                data = [fechas, macd, macd_hist, macd_sign]
+                data_json = json.dumps(data)
+                return HttpResponse(data_json, content_type='application/json')
+        except Exception as inst:
+            print(inst)
             # import pdb
             # pdb.set_trace()
-            for i in share_data.keys(): 
-                fechas.append(i)
-                cierres.append(share_data[i]['4. close'])
-            fechas = fechas[0:1000]
-            cierres = cierres[0:1000]
-            fechas.reverse()
-            cierres.reverse()
-            request.session['fechas_data'] = fechas[:-5]
-            request.session['stock_prices'] = cierres[:-5]
-            request.session['future_prices'] = cierres[5:]
-            data = [share_symbol,fechas,cierres]
-            data_json = json.dumps(data)
-            return HttpResponse(data_json, content_type='application/json')
-
-        # Else if user request Bollinger Data
-        elif 'bollinger_data' in request.GET:
-            share_symbol = request.GET['bollinger_data'].upper()
-            bbands_data, bbands_meta = tech_ind.get_bbands(symbol=share_symbol, interval='5min')
-            bbands_values = [[],[],[]]
-            for i in bbands_data.keys():
-                bbands_values[0].append(bbands_data[i]['Real Middle Band'])
-                bbands_values[1].append(bbands_data[i]['Real Upper Band'])
-                bbands_values[2].append(bbands_data[i]['Real Lower Band'])
-            anly100_middle = bbands_values[0][:77]
-            anly100_upper = bbands_values[1][:77]
-            anly100_lower = bbands_values[2][:77]
-            anly100_middle.reverse()
-            anly100_upper.reverse()
-            anly100_lower.reverse()
-            print(share_symbol)
-
-            data = [anly100_middle, anly100_upper, anly100_lower]
-            data_json = json.dumps(data)
-
-            return HttpResponse(data_json, content_type='application/json')
-
-        # Else if user request RSI Data
-        elif 'get_rsi_data' in request.GET:
-            share_symbol = request.GET['get_rsi_data'].upper()
-            rsi_data, rsi_meta = tech_ind.get_rsi(symbol=share_symbol, interval='5min', time_period=14, series_type = 'close')
-            rsi_values = []
-            fechas = []
-            for i in rsi_data.keys():
-                fechas.append(i)
-                rsi_values.append(rsi_data[i]['RSI'])
-            # fechas.reverse()
-            # rsi_values.reverse()
-            fechas = fechas[:1000]
-            rsivalues = rsi_values[:1000]
-            fechas.reverse()
-            rsivalues.reverse()
-            request.session['rsi_values'] = rsivalues[:-5]
-            data = [share_symbol, fechas, rsivalues]
-            data_json = json.dumps(data)
-            return HttpResponse(data_json, content_type='application/json')
-
-
-        # Else if user request MACD Data
-        elif 'get_macd_data' in request.GET:
-            share_symbol = request.GET['get_macd_data'].upper()
-            macd_data, macd_meta = tech_ind.get_macd(symbol=share_symbol, interval='5min', series_type='close', fastperiod=12, slowperiod=26, signalperiod=9)
-            # import pdb
-            # pdb.set_trace()
-            fechas = []
-            macd_values = [[],[],[]]
-            for i in macd_data.keys():
-                fechas.append(i)
-                macd_values[0].append(macd_data[i]['MACD'])
-                macd_values[1].append(macd_data[i]['MACD_Hist'])
-                macd_values[2].append(macd_data[i]['MACD_Signal'])
-            fechas = fechas[:1000]
-            macd = macd_values[0][:1000]
-            macd_hist = macd_values[1][:1000]
-            macd_sign = macd_values[2][:1000]
-            fechas.reverse()
-            macd.reverse()
-            macd_hist.reverse()
-            macd_sign.reverse()
-            request.session['macd_data'] = [macd[:-5], macd_hist[:-5], macd_sign[:-5]]
-            data = [fechas, macd, macd_hist, macd_sign]
-            data_json = json.dumps(data)
-            return HttpResponse(data_json, content_type='application/json')
+            data_json = json.dumps(inst.args[0])
+            return HttpResponseBadRequest(data_json, content_type='application/json')
 
     # Else return the homepage rendering
     return render(request, 'home.html', context)
@@ -182,7 +188,7 @@ def model_trained_view(request, *args, **kwargs):
 
         message = 'The predictions made succesfully'
         print(message)
-        predictions_array.reverse()
-        prices_set.reverse()
+        predictions_array
+        prices_set
 
         return HttpResponse(json.dumps([message,final_fechas,prices_set,predictions_array]), content_type='application/json')

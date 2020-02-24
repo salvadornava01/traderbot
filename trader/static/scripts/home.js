@@ -388,17 +388,24 @@ $(document).ready(function(){
         $.ajax({
             method: 'GET',
             url: '',
-            data: {stock: stock_symbol}
+            data: {stock: stock_symbol},
+            success:function(data) {
+                $('#stock_submit').removeAttr("disabled");
+                $('#stock_submit').html('Get Price Data');
+                console.log(data)
+                var title = data[0]
+                var xs = data[1]
+                var ys = data[2]
+                chart_updateData(myChart,title,xs,ys);
+            },
+            error: function(data){
+                console.log(data['responseText'])
+                $('#stock_submit').removeAttr("disabled");
+                $('#stock_submit').html('Get Price Data');
+                alert(data['responseText'])
+            },
         })
-        .done(function(data) {
-            $('#stock_submit').removeAttr("disabled");
-            $('#stock_submit').html('Get Price Data');
-            console.log(data)
-            var title = data[0]
-            var xs = data[1]
-            var ys = data[2]
-            chart_updateData(myChart,title,xs,ys);
-        })
+
     })
     $('#bollinger_data').click(function(){
         var stock_symbol = $('input#stock_symbol').val();
@@ -407,37 +414,43 @@ $(document).ready(function(){
         $.ajax({
             method: 'GET',
             url: '',
-            data: {bollinger_data: stock_symbol}
-        })
-        .done(function(data) {
-            $('#bollinger_data').removeAttr("disabled");
-            $('#bollinger_data').html('Get Price Data');
-            var middlebbands_Dataset = {
-				label: 'Middle BBands',
-				backgroundColor: 'rgba(17, 214, 214, 0.8)',
-                borderColor: 'rgba(17, 214, 214, 1)',
-                pointRadius: 2,
-				data: data[0],
-				fill: false
-            };
-            var upperbbands_Dataset = {
-				label: 'Upper BBands',
-				backgroundColor: 'rgba(214, 17, 70, 0.8)',
-                borderColor: 'rgba(214, 17, 70, 1)',
-                pointRadius: 2,
-				data: data[1],
-				fill: false
-            };
-            var lowerbbands_Dataset = {
-				label: 'Lower BBands',
-				backgroundColor: 'rgba(214, 17, 194, 0.8)',
-                borderColor: 'rgba(214, 17, 194, 1)',
-                pointRadius: 2,
-				data: data[2],
-				fill: false
-			};
-            console.log(data)
-            chart_add_bbandData(myChart,middlebbands_Dataset,upperbbands_Dataset,lowerbbands_Dataset);
+            data: {bollinger_data: stock_symbol},
+            success: function(data) {
+                $('#bollinger_data').removeAttr("disabled");
+                $('#bollinger_data').html('Get Bollinger Data');
+                var middlebbands_Dataset = {
+                    label: 'Middle BBands',
+                    backgroundColor: 'rgba(17, 214, 214, 0.8)',
+                    borderColor: 'rgba(17, 214, 214, 1)',
+                    pointRadius: 2,
+                    data: data[0],
+                    fill: false
+                };
+                var upperbbands_Dataset = {
+                    label: 'Upper BBands',
+                    backgroundColor: 'rgba(214, 17, 70, 0.8)',
+                    borderColor: 'rgba(214, 17, 70, 1)',
+                    pointRadius: 2,
+                    data: data[1],
+                    fill: false
+                };
+                var lowerbbands_Dataset = {
+                    label: 'Lower BBands',
+                    backgroundColor: 'rgba(214, 17, 194, 0.8)',
+                    borderColor: 'rgba(214, 17, 194, 1)',
+                    pointRadius: 2,
+                    data: data[2],
+                    fill: false
+                };
+                console.log(data)
+                chart_add_bbandData(myChart,middlebbands_Dataset,upperbbands_Dataset,lowerbbands_Dataset);
+            },
+            error: function(data){
+                console.log(data['responseText'])
+                alert(data['responseText'])
+                $('#bollinger_data').removeAttr("disabled");
+                $('#bollinger_data').html('Get Bollinger Data');
+            },
         })
     })
     $('#get_rsi_data').click(function (){
@@ -448,16 +461,22 @@ $(document).ready(function(){
         $.ajax({
             method: 'GET',
             url: '',
-            data: {get_rsi_data: stock_symbol}
-        })
-        .done(function(data) {
-            console.log(data)
-            $('#get_rsi_data').removeAttr("disabled");
-            $('#get_rsi_data').html('Get RSI Data');
-            var title = 'RSI DATA'
-            var xs = data[1]
-            var ys = data[2]
-            chart_updateData(rsi_chart,title,xs,ys);
+            data: {get_rsi_data: stock_symbol},
+            success: function(data) {
+                console.log(data)
+                $('#get_rsi_data').removeAttr("disabled");
+                $('#get_rsi_data').html('Get RSI Data');
+                var title = 'RSI DATA'
+                var xs = data[1]
+                var ys = data[2]
+                chart_updateData(rsi_chart,title,xs,ys);
+            },
+            error: function(data){
+                console.log(data['responseText'])
+                alert(data['responseText'])
+                $('#get_rsi_data').removeAttr("disabled");
+                $('#get_rsi_data').html('Get RSI Data');
+            },
         })
     });
     $('#get_macd_data').click(function (){
@@ -468,17 +487,23 @@ $(document).ready(function(){
         $.ajax({
             method: 'GET',
             url: '',
-            data: {get_macd_data: stock_symbol}
-        })
-        .done(function(data) {
-            console.log(data)
-            $('#get_macd_data').removeAttr("disabled");
-            $('#get_macd_data').html('Get MACD Data');
-            var fechas = data[0]
-            var macd = data[1]
-            var macd_hist = data[2]
-            var macd_signal = data[3]
-            chart_add_macd(macd_chart, fechas, macd, macd_hist, macd_signal)
+            data: {get_macd_data: stock_symbol},
+            success: function(data) {
+                console.log(data)
+                $('#get_macd_data').removeAttr("disabled");
+                $('#get_macd_data').html('Get MACD Data');
+                var fechas = data[0]
+                var macd = data[1]
+                var macd_hist = data[2]
+                var macd_signal = data[3]
+                chart_add_macd(macd_chart, fechas, macd, macd_hist, macd_signal)
+            },
+            error: function(data){
+                console.log(data['responseText'])
+                alert(data['responseText'])
+                $('#get_macd_data').removeAttr("disabled");
+                $('#get_macd_data').html('Get MACD Data');
+            },
         })
     });
     $('#train-test').click(function (){
@@ -508,6 +533,8 @@ $(document).ready(function(){
         })
     });
     $('#make-predict').click(function (){
+        $('#make-predict').attr("disabled", "disabled");
+        $('#make-predict').html('Predicting...');
         $.ajax({
             method: 'GET',
             url: '/modeltrained/',
@@ -527,6 +554,10 @@ $(document).ready(function(){
 				fill: false
             };
             chart_add_Data(newdata_chart,predictions_Dataset)
+            $('#make-predict').html('Completed!');
+                    setTimeout(function(){ 
+                        $("#make-predict").html('Predict Prices');
+                        $('#make-predict').removeAttr("disabled"); }, 1500);
             },
             error: function(data){
                 console.log('errorxd')
